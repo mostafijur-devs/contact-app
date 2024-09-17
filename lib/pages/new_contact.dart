@@ -1,7 +1,4 @@
 import 'dart:io';
-
-
-import 'package:contact_maneger/db/db_helper.dart';
 import 'package:contact_maneger/models/contact_models.dart';
 import 'package:contact_maneger/provider/contact_provider.dart';
 import 'package:contact_maneger/utils/constant.dart';
@@ -25,18 +22,55 @@ class _NewContactPageState extends State<NewContactPage> {
   final _addresControlar = TextEditingController();
   final _mobileControlar = TextEditingController();
   final _webControlar = TextEditingController();
-
   DateTime? _selectedDate;
   String? _group;
   String? _imagePath;
   Gender? gender;
   final _formKey = GlobalKey<FormState>();
+  int? updatedId;
+  late bool isUpdating;
 
+  @override
+  void didChangeDependencies() {
+    final arg = ModalRoute.of(context)?.settings.arguments ;
+    if(arg != null){
+      updatedId = arg as int;
+      context.read<ContactProvider>().getContactById(updatedId!)
+          .then((value){
+        setState(() {
+          _nameControlar.text = value.name;
+          _mobileControlar.text = value.mobile;
+          _emailControlar.text = value.email;
+          _addresControlar.text = value.address;
+          _webControlar.text = value.webSite ?? '';
+          _group = value.group;
+          _imagePath = value.image != null ? value.image : null;
+          if(value.dod != null){
+            _selectedDate = DateTime.parse('2017-02-03');
+          }else{
+            _selectedDate = null;
+          }
+          if(value.gender == Gender.Male.name){
+            gender = Gender.Male;
+          }
+          if(value.gender == Gender.Female.name){
+            gender = Gender.Female;
+          }
+          if(value.gender == Gender.Other.name){
+            gender = Gender.Other;
+          }
+        });
+      });
+    }
+    isUpdating = updatedId != null ? true : false;
+
+    super.didChangeDependencies();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Contact'),
+        title: Text( isUpdating ? ' Update':'New Contact'),
         actions: [IconButton(onPressed: _save, icon: const Icon(Icons.save))],
       ),
       body: Form(
@@ -282,14 +316,28 @@ class _NewContactPageState extends State<NewContactPage> {
         dod: getDateFormat(_selectedDate!)
       );
       // contact.read<ContactProvider>().addContact(contact).then()
-      context.read<ContactProvider>().addContact(contact)
-           .then((value) {
-              showMsg(context, 'Saved');
-              Navigator.pop(context);
-           },)
-      .catchError((error){
-         showMsg(context, error.toString());
-      });
+      if(isUpdating){
+        contact.id = updatedId!;
+        context.read<ContactProvider>().updateContact(contact)
+            .then((value) {
+          showMsg(context, 'Upgrade');
+          Navigator.pop(context);
+        },)
+            .catchError((error){
+          showMsg(context, error.toString());
+        });
+      }
+      else{
+        context.read<ContactProvider>().addContact(contact)
+            .then((value) {
+          showMsg(context, 'Saved');
+          Navigator.pop(context);
+        },)
+            .catchError((error){
+          showMsg(context, error.toString());
+        });
+      }
+
 
     }
   }

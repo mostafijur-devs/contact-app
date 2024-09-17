@@ -15,6 +15,14 @@ Future<void> addContact (ConttactModels contact) async{
   _contactList.add(contact);
   notifyListeners();
 }
+
+Future<void> updateContact (ConttactModels contact) async{
+   await _db.upDateContact(contact);
+  final position = _contactList.indexWhere((item)=> item.id==contact.id);
+  _contactList.removeAt(position);
+  _contactList.insert(position, contact);
+  notifyListeners();
+}
 Future<int> deleteContact(ConttactModels contact) async{
   return await _db.deleteContact(contact.id!);
 }
@@ -36,6 +44,10 @@ Future<void> getAllContact () async{
 
 Future<void> getAllFevariteContact () async{
   _contactList = await _db.getAllFevariteContact();
+  notifyListeners();
+}
+Future<void> getAllUnfevariteContact () async{
+  _contactList = await _db.getAllUnfevariteContact();
   notifyListeners();
 }
 

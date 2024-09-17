@@ -1,5 +1,4 @@
 import 'package:contact_maneger/custom_widgets/contact_item_view.dart';
-import 'package:contact_maneger/main.dart';
 import 'package:contact_maneger/pages/new_contact.dart';
 import 'package:contact_maneger/provider/contact_provider.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +15,6 @@ class ContactHome extends StatefulWidget {
 
 class _ContactHomeState extends State<ContactHome> {
   int _currentIndex = 0;
-
-
   @override
   void didChangeDependencies() {
     context.read<ContactProvider>().getAllContact();
@@ -84,6 +81,7 @@ class _ContactHomeState extends State<ContactHome> {
           itemCount: provider.contactList.length,
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
         padding: const EdgeInsets.all(20),
         child: FloatingActionButton(
@@ -97,28 +95,40 @@ class _ContactHomeState extends State<ContactHome> {
 
       bottomNavigationBar: BottomAppBar(
         padding: EdgeInsets.zero,
+        color: Colors.grey,
         child: Consumer<ContactProvider>(
           builder: (context, provider, child) =>BottomNavigationBar(
             onTap: (index) {
               setState(() {
                 _currentIndex = index;
-
               });
+              if(_currentIndex==0){
+                context.read<ContactProvider>().getAllContact();
+              }
+              if(_currentIndex==1){
+                context.read<ContactProvider>().getAllFevariteContact();
+              }
+              if(_currentIndex==2){
+                context.read<ContactProvider>().getAllUnfevariteContact();
+              }
             } ,
             selectedItemColor: Colors.green,
             currentIndex: _currentIndex,
-              items: [
+              items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.list),
               label: 'All',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.favorite),
-              label: 'fevarite',
+              label: 'favorite',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_border),
+              label: 'Unfavorite',
             ),
           ]),
         ),
-        color: Colors.grey,
       ),
     );
   }

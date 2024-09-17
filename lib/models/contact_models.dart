@@ -16,20 +16,17 @@ const tableContactColFavorite = 'favorite';
 class ConttactModels {
   int? id;
   String name;
-
   String mobile;
-
   String email;
   String address;
   String group;
   String gender;
   String? webSite;
   String? image;
-
   String? dod;
   bool favorite;
 
-  ConttactModels({
+    ConttactModels({
     this.id,
     required this.name,
     required this.mobile,
@@ -56,6 +53,9 @@ class ConttactModels {
       tableContactColDob: dod,
       tableContactColFavorite: favorite ? 1 : 0,
     };
+    if(id != null){
+      map[tableContactColId]= id;
+    }
     return map;
   }
 

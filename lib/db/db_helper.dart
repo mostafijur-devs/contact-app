@@ -25,7 +25,12 @@ class DbHelper{
 
   Future<int> insertContact ( ConttactModels contact) async{
     final db = await _open();
-    return db.insert(tableContact,contact.toMap());
+    return db.insert(tableContact, contact.toMap());
+  }
+
+  Future<int> upDateContact ( ConttactModels contact) async{
+    final db = await _open();
+    return db.update(tableContact, contact.toMap(), where: '$tableContactColId = ? ', whereArgs: [contact.id]);
   }
 
   Future<List<ConttactModels>> getContactList ( ) async{
@@ -39,6 +44,11 @@ class DbHelper{
     final mapList = await db.query(tableContact , orderBy: tableContactColName, where: '$tableContactColFavorite = ?', whereArgs: [1]);
     return List.generate(mapList.length, (index) => ConttactModels.fromMap(mapList[index]));
   }
+  Future<List<ConttactModels>> getAllUnfevariteContact ( ) async{
+    final db = await _open();
+    final mapList = await db.query(tableContact , orderBy: tableContactColName, where: '$tableContactColFavorite = ?', whereArgs: [0]);
+    return List.generate(mapList.length, (index) => ConttactModels.fromMap(mapList[index]));
+  }
 
   Future<ConttactModels> getContactById (int id ) async{
     final db = await _open();
@@ -47,7 +57,7 @@ class DbHelper{
   }
   Future<int> upDateFavorite (int id, int value) async{
     final db = await _open();
-    return db.update(tableContact, {tableContactColFavorite : value},where: '$tableContactColFavorite = ?', whereArgs: [id]);
+    return db.update(tableContact, {tableContactColFavorite : value}, where: '$tableContactColId = ?', whereArgs: [id]);
   }
 
 
